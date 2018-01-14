@@ -1,0 +1,13 @@
+sudo: false
+language: ruby
+rvm:
+- 2.3.3
+before_install: gem install bundler -v 1.16.0
+deploy:
+  provider: rubygems
+  api_key:
+    secure: DfDUVJUU+HGxDrzqF/jpZZDWqd8yJ46t3giw7D9Qv++dOT7Foa0NEdF2sHlkVjj4/SHzJNa81iOm23uqJtmlx7m5QGwyKsZ5HcaEvJUSzxDWGW+Fzt9pWVlRuwSu4XxwatqtSNfAydOHq12n7o6CsRREeH66pmhjd8pMIXuk9we4w/G2/G/XnGpPOLIHZ0Fu0vVNe9Pvt4jFeNB1dhH1gUh1zl6+doRzq0qSCj8qucZkUV/hxfmTp1UOyZoVCuJNsUCn/NjPKgNxyat1ink1mxf94VRxiEEISzxRgR9Ca8TUhileqez85VU/n1Cf7qY+IWIVt8m45rR5vl4mTj+MHQTgbdGa1CkAXrmylzGOtcdqZwLvmL+IJr9qh8cj4fOTxKWvA8qnyiy5+uMeVhqEb6VSdAk6wNtTTkriTPXZ5bhz9RY3T3L/yVwsvZTHnXsmqJZi6/G8v6Aq/gJhUcDlUs3Ej7YHfCZUx64vS0OBfaaCV373dc2L+KvNKwxrClYF7/SyWHWwFX7POh+2fj7L1pepmuoMdj5iQpEyNyjBPhk41XBOhflzpk2aRrfPVAqe36PgqDbbQPnowfamvQIvkQkzs9CsDKR97Vy3oQWp2Q3PxT5hAExAzzZh/gNRtRhHQUXlliZxgw0qm1fNly3jO79OmEbGVcIOZbg3X2Qy+Yk=
+  gem: lib-dhcp
+  on:
+    tags: true
+    repo: pwojcieszonek/lib-dhcp

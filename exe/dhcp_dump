@@ -1,0 +1,83 @@
+#Author: Piotr Wojcieszonek
+#e-mail: piotr@wojcieszonek.pl
+# Copyright 12.01.2018 by Piotr Wojcieszonek
+
+#!/usr/bin/env ruby
+
+require 'lib/dhcp'
+require 'socket'
+
+def option_print(message)
+  printf "OPTION: %-3s (%3s) %-40s : %-3s %s\n", message.option53.oid, message.option53.len, message.option53.name, message.option53.to_i, message.option53.to_s
+  printf "OPTION: %-3s (%3s) %-40s :\n", message.option55.oid, message.option55.len, message.option55.name
+  message.option55.value.each do |request|
+    printf "%60s %-3s %s\n", '', request, Lib::DHCP::Option::NAME[request]
+  end
+
+  message.options.each do |option|
+    case option.oid
+      when Lib::DHCP::Option::PAD
+        next
+      when Lib::DHCP::Option::MESSAGE_TYPE
+        next
+      when Lib::DHCP::Option::PARAMETER_REQUEST
+        next
+      when Lib::DHCP::Option::VENDOR_SPECIFIC
+        option43_print(option)
+      when Lib::DHCP::Option::END_OPTION
+        printf "OPTION: %-3s (%3s) %-40s\n", option.oid, option.len, option.name
+      else
+        if option.value.is_a?(Array)
+          printf "OPTION: %-3s (%3s) %-40s :\n", option.oid, option.len, option.name
+          option.value.each do |sub_option|
+            printf "\t SUB OPTION: %3s (%3s) %-28s: %s\n", sub_option.oid, sub_option.len, sub_option.name, sub_option.to_s
+          end
+        else
+          printf "OPTION: %-3s (%3s) %-40s : %s\n", option.oid, option.len, option.name, option
+        end
+    end
+
+  end
+end
+
+def option43_print(option)
+  option.value.each do |sub_option|
+    printf "\t SUB OPTION: %3s (%3s) %-28s: %s\n", sub_option.oid, sub_option.len, sub_option.name, sub_option.payload.to_s
+  end
+end
+
+soc = UDPSocket.new
+soc.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
+begin
+  soc.bind('0.0.0.0', 67)
+rescue Errno::EACCES
+  raise Exception, 'You need root privilege to access socket'
+end
+
+loop do
+  data = soc.recvfrom(1500)[0]
+  begin
+    message = Lib::DHCP::Message.unpack(data)
+    puts "--------------------------------------------------------"
+    printf "%7s %s\n", 'Time:', Time.now.strftime('%F %T')
+    printf "%7s %s\n", 'OP:', message.op
+    printf "%7s %s\n", 'HTYPE:', "#{message.htype.to_i} (#{message.htype.to_s})"
+    printf "%7s %s\n", 'HLEN:', message.hlen
+    printf "%7s %s\n", 'HOPS:', message.hops
+    printf "%7s %s\n", 'XID:', message.xid.to_hex
+    printf "%7s %s\n", 'SECS:', message.secs
+    printf "%7s %s\n", 'FLAGS:', message.flags
+    printf "%7s %s\n", 'CIADDR:', message.ciaddr
+    printf "%7s %s\n", 'YIADDR:', message.yiaddr
+    printf "%7s %s\n", 'SIADDR:', message.siaddr
+    printf "%7s %s\n", 'GIADDR:', message.giaddr
+    printf "%7s %s\n", 'CHADDR:', message.chaddr
+    printf "%7s %s\n", 'SNAME:', message.sname
+    printf "%7s %s\n", 'FNAME:', message.file
+    option_print(message)
+  rescue Exception => e
+    STDERR.puts e.message
+    STDERR.puts e.backtrace
+  end
+end
+
