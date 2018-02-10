@@ -19,7 +19,7 @@ module Lib
         oid = self.class.name.split('::').last.sub(/Option/, '').to_i
         sub_options = []
         sub_option.each do |sub|
-          if sub.is_a? Lib::DHCP::Option122::SubOption
+          if sub.is_a? Lib::DHCP::Option
             opt = sub
           elsif sub.is_a? Array
             case sub[0].to_i
@@ -141,10 +141,10 @@ module Lib
                 @type = 1
                 @payload = tsp_server_address
               when String
-                if Net::Address::IPv4(tsp_server_address) == tsp_server_address.to_s
-                  @type = 1
+                begin
                   @payload = Net::Address::IPv4.new(tsp_server_address)
-                else
+                  @type = 1
+                rescue ArgumentError
                   @type = 0
                   @payload = tsp_server_address
                 end
@@ -161,16 +161,17 @@ module Lib
             if type == 1
               5
             else
-              @payload.to_s.split('.').map{|label| [label.length, label.unpack('C*')]}.flatten.size + 1
+              @payload.to_s.split('.').map{|label| [label.length, label.unpack('C*')]}.flatten.size + 2
+              #@payload.size + 1
             end
           end
 
           def pack
             if @type == 1
-              [2, self.len.to_i, @payload.to_i].pack('C2N')
+              [@oid.to_i, self.len.to_i, 1, @payload.to_i].pack('C3N')
             elsif @type == 0
               fqdn_encode = @payload.to_s.split('.').map{|label| [label.length, label.unpack('C*')]}.flatten
-              [2, fqdn_encode.size + 1,  *fqdn_encode,0].pack('C*')
+              [@oid.to_i, fqdn_encode.size + 2, 0, *fqdn_encode,0].pack('C*')
             else
               raise ArgumentError, 'Unknown TSP Provisioning Server Address type'
             end
