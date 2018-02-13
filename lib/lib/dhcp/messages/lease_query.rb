@@ -56,7 +56,30 @@ module Lib
 
         protected
         def sanity_check
-          #TODO LeaseQuery Sanity Check
+          raise Lib::DHCP::SanityCheck::LeaseQuery, 'No GIADDR given' if self.giaddr == 0
+          if self.ciaddr == 0 and self.chaddr.nil? and self.htype == 0 and self.hlen == 0 and self.option61.nil?
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'Unknown query type'
+          end
+          raise Lib::DHCP::SanityCheck::LeaseQuery, 'Unknown query type' if self.htype == 0 and self.hlen != 0
+          raise Lib::DHCP::SanityCheck::LeaseQuery, 'Unknown query type' if self.htype != 0 and self.hlen == 0
+          if self.ciaddr != 0
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The Client-identifier option (option 61) MUST NOT appear in the ' +
+                'query by IP'  unless self.option61.nil?
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The values of htype, hlen, and chaddr MUST be set to zero in ' +
+                'the query by IP' unless self.htype == 0 or self.hlen == 0
+          end
+          if self.htype != 0 and self.hlen != 0
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The "ciaddr" field MUST be set to zero in the query ' +
+                'by MAC address' unless self.ciaddr == 0
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The Client-identifier option (option 61) MUST NOT appear in the ' +
+                'query by MAC'  unless self.option61.nil?
+          end
+          if self.option61
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The "ciaddr" field MUST be set to zero in the query ' +
+                'by Client identifier' unless self.ciaddr == 0
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The values of htype, hlen, and chaddr MUST be set to zero in ' +
+                'the query by Client identifier' unless self.htype == 0 or self.hlen == 0
+          end
         end
       end
     end
