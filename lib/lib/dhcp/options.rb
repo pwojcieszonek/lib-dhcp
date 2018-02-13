@@ -24,23 +24,23 @@ module Lib
       end
 
       def add(option)
-        if option.is_a? Array
-          @options << eval("Lib::DHCP::Option#{option[0]}").new(option[1])
-        elsif option.is_a? Option
-          @options << option
-        else
-          @options << Lib::DHCP::Option.unpack(option)
-        end
+        @options << create_option(option)
       end
 
       def []=(index, option)
-        if option.is_a? Array
-          @options[index] = eval("Lib::DHCP::Option#{option[0]}").new(option[1])
-        elsif option.is_a? Option
-          @options[index] = option
+        option = create_option(option)
+        if include?(option) and @options[index].oid != option.oid
+          @options[index] = option if option.oid == 0
         else
-          @options << Lib::DHCP::Option.unpack(option)
+          @options[index] = create_option(option)
         end
+
+      end
+
+      def include?(option)
+        return ! select(option.oid).empty? if option.is_a?(Option)
+        return ! select(option).empty? if option.is_a?(Integer)
+        false
       end
 
       def select(oid)
@@ -66,6 +66,20 @@ module Lib
           #(option.oid == 0 or option.oid == 255) ? offset += (option.len.to_i + 1) : offset += (option.len.to_i + 2)
         end
         options
+      end
+
+      protected
+
+      def create_option(option)
+        if option.is_a? Array
+          eval("Lib::DHCP::Option#{option[0].to_i}").new(option[1])
+        elsif option.is_a? Option
+          option
+        elsif option.is_a?(Integer) and (option == 0 or option == 255)
+          eval("Lib::DHCP::Option#{option.to_i}").new(option.to_i)
+        else
+          Lib::DHCP::Option.unpack(option)
+        end
       end
 
     end

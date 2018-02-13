@@ -19,39 +19,16 @@ module Lib
         oid = self.class.name.split('::').last.sub(/Option/, '').to_i
         sub_options = []
         sub_option.each do |sub|
-          if sub.is_a? Lib::DHCP::Option
-            opt = sub
-          elsif sub.is_a? Array
-            case sub[0].to_i
-              when 1
-                opt = Lib::DHCP::Option122::SubOption::Option1.new(sub[1])
-              when 2
-                opt = Lib::DHCP::Option122::SubOption::Option2.new(sub[1])
-              when 3
-                opt = Lib::DHCP::Option122::SubOption::Option3.new(sub[1])
-              when 4
-                opt = Lib::DHCP::Option122::SubOption::Option4.new(*sub[1])
-              when 5
-                opt = Lib::DHCP::Option122::SubOption::Option5.new(*sub[1])
-              when 6
-                opt = Lib::DHCP::Option122::SubOption::Option6.new(sub[1])
-              when 7
-                opt = Lib::DHCP::Option122::SubOption::Option7.new(sub[1])
-              when 8
-                opt = Lib::DHCP::Option122::SubOption::Option8.new(sub[1])
-              else
-                #raise ArgumentError, "Not implemented sub option #{sub[0]} for Option 122"
-                opt = Lib::DHCP::Option122::SubOption::Option.new(sub[0].to_i, sub[1])
-            end
-            #opt = Lib::DHCP::SubOption.new(sub[0], sub[1])
-          else
-            raise ArgumentError, 'Unknown SubOption parameter type'
-          end
+          opt = create_sub_option(sub)
           sub_options << opt
           define_singleton_method("option#{opt.oid.to_i}".to_sym) { opt }
           #define_singleton_method(:option1) {opt}
         end
         super oid, sub_options
+      end
+
+      def add(sub_option)
+        @payload << create_sub_option(sub_option)
       end
 
 
@@ -337,6 +314,40 @@ module Lib
 
         end
       end
+
+      protected
+
+
+      def create_sub_option(option)
+        if option.is_a? Lib::DHCP::Option
+          option
+        elsif option.is_a? Array
+          case option[0].to_i
+            when 1
+              Lib::DHCP::Option122::SubOption::Option1.new(option[1])
+            when 2
+              Lib::DHCP::Option122::SubOption::Option2.new(option[1])
+            when 3
+              Lib::DHCP::Option122::SubOption::Option3.new(option[1])
+            when 4
+              Lib::DHCP::Option122::SubOption::Option4.new(*option[1])
+            when 5
+              Lib::DHCP::Option122::SubOption::Option5.new(*option[1])
+            when 6
+              Lib::DHCP::Option122::SubOption::Option6.new(option[1])
+            when 7
+              Lib::DHCP::Option122::SubOption::Option7.new(option[1])
+            when 8
+              Lib::DHCP::Option122::SubOption::Option8.new(option[1])
+            else
+              #raise ArgumentError, "Not implemented sub option #{sub[0]} for Option 122"
+              Lib::DHCP::Option122::SubOption::Option.new(option[0].to_i, option[1])
+          end
+        else
+          raise ArgumentError, 'Unknown SubOption for Option122'
+        end
+      end
+
     end
   end
 end
