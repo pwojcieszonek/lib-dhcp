@@ -52,15 +52,15 @@ module Lib
         end
 
         def query_by_ip?
-          (message.ciaddr != 0) ? true : false
+          (ciaddr != 0) ? true : false
         end
 
         def query_by_mac?
-          (message.htype != 0 and message.hlen != 0 and message.chaddr != 0) ? true : false
+          (htype != 0 and hlen != 0 and chaddr != 0) ? true : false
         end
 
         def query_by_client_id?
-          message.option61.nil? ? false : true
+          option61.nil? ? false : true
         end
 
         protected :op=
@@ -71,7 +71,7 @@ module Lib
         def sanity_check
           if query_by_ip?
             raise Lib::DHCP::SanityCheck::LeaseQuery, 'The values of htype, hlen, and chaddr MUST be set to zero '+
-                'in the query by IP' unless self.htype == 0 and self.hlen == 0  and self.chaddr != 0
+                'in the query by IP' unless self.htype == 0 and self.hlen == 0  and self.chaddr == 0
             raise Lib::DHCP::SanityCheck::LeaseQuery, 'The Client-identifier option (option 61) MUST NOT appear in the ' +
                 'query by IP'  unless self.option61.nil?
           elsif query_by_mac?
