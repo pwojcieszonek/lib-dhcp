@@ -5,13 +5,21 @@
 
 
 require_relative 'option'
-require_relative 'type/raw'
+require 'lib/dhcp/options/type/ip_array'
 
 module Lib
   module DHCP
     class Option92 < Option
-      #TODO Option92
-      include Lib::DHCP::Option::Type::Raw
+
+      # This option is used to return all of the IP addresses
+      # associated with the DHCP client specified in a particular DHCPLEASEQUERY message.
+      # The code for this option is 92.  The minimum length for this option is 4 octets,
+      # and the length MUST always be a multiple of 4.
+
+      include Type::IPArray
+
+      alias_method :associated_ip, :payload
+      alias_method :associated_ip=, :payload=
     end
   end
 end

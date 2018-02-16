@@ -34,6 +34,7 @@ module Lib
             raise TypeError, "Can't convert #{options.class.name} to Lib::DHCP::Option"
           end
           self.options.add Lib::DHCP::Option53.new(LEASE_QUERY)
+
         end
 
         def pack
@@ -50,13 +51,42 @@ module Lib
           res
         end
 
+        def query_by_ip?
+          (ciaddr != 0) ? true : false
+        end
+
+        def query_by_mac?
+          (htype != 0 and hlen != 0 and chaddr != 0) ? true : false
+        end
+
+        def query_by_client_id?
+          option61.nil? ? false : true
+        end
+
         protected :op=
         # noinspection RubyResolve
         protected :option53=
 
         protected
         def sanity_check
-          #TODO LeaseQuery Sanity Check
+          if query_by_ip?
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The values of htype, hlen, and chaddr MUST be set to zero '+
+                'in the query by IP' unless self.htype == 0 and self.hlen == 0  and self.chaddr == 0
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The Client-identifier option (option 61) MUST NOT appear in the ' +
+                'query by IP'  unless self.option61.nil?
+          elsif query_by_mac?
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The "ciaddr" field MUST be set to zero in the query ' +
+                'by MAC address' unless self.ciaddr == 0
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The Client-identifier option (option 61) MUST NOT appear in the ' +
+                'query by MAC'  if self.option61
+          elsif query_by_client_id?
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The "ciaddr" field MUST be set to zero in the query ' +
+                'by Client identifier' unless self.ciaddr == 0
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'The values of htype, hlen, and chaddr MUST be set to zero in ' +
+                'the query by Client identifier' unless self.htype == 0 or self.hlen == 0  and self.chaddr != 0
+          else
+            raise Lib::DHCP::SanityCheck::LeaseQuery, 'Unknown query type'
+          end
         end
       end
     end

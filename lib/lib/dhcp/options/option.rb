@@ -140,6 +140,8 @@ module Lib
       STREET_TALK_DIRECTORY_SERVER= 0x4c
       USER_CLASS= 0x4d
       RELAY_AGENT = 0x52
+      CLIENT_LAST_TRANSACTION_TIME= 0x5b
+      ASSOCIATED_IP = 0x5c
       PRIVATE= 0xaf
       END_OPTION = 0xff
 
@@ -235,8 +237,8 @@ module Lib
           88 => 'BCMCS Controller Domain Name list',
           89 => 'BCMCS Controller IPv4 address list.',
           90 => 'Authentication',
-          91 => 'client-last-transaction-time',
-          92 => 'associated-ip',
+          91 => 'Client last transaction time',
+          92 => 'Associated IP',
           93 => 'Client System Architecture Type',
           119 => 'Domain Search',
           121 => 'Classless Static Route Option',
