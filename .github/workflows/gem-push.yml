@@ -2,10 +2,21 @@ name: Ruby Gem
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
 
 jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create Git tag
+        run: |
+          VERSION=$(ruby -e "require 'rubygems'; spec = Gem::Specification.load(Dir.glob('*.gemspec').first); puts spec.version")
+          git tag v$VERSION
+          git push origin v$VERSION
+
   build-and-publish:
     runs-on: ubuntu-latest
     permissions:
