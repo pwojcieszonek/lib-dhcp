@@ -9,16 +9,61 @@ class Message < Minitest::Test
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    @message = Lib::DHCP::Message.new(op:1, chaddr: '00:11:22:33:44:55')
+    @message = Lib::DHCP::Message.new(op: 1, chaddr: '00:11:22:33:44:55', xid: 3474444682)
+    @from_json = Lib::DHCP::Message.from_json @message.to_json
+  end
+
+  def test_to_json
+    json = { "op" => { "code" => "1", "name" => "BOOTREQUEST" },
+             "htype" => { "code" => "1", "name" => "Ethernet (10Mb)" },
+             "hlen" => "6",
+             "hops" => "0",
+             "xid" => "3474444682",
+             "secs" => "0",
+             "flags" => "0x0",
+             "ciaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "yiaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "siaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "giaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "chaddr" => "00:11:22:33:44:55:00:00:00:00:00:00:00:00:00:00",
+             "sname" => ".",
+             "file" => ".",
+             "options" => [] }
+    assert_equal json, JSON.parse(@message.to_json)
   end
 
   def test_respond_to_name
     assert_respond_to @message, :name
+    assert_respond_to @from_json, :name
   end
 
   def test_name
     message = @message.dup
     message.option53=1
+    assert_equal 'DHCP Discover', message.name
+
+    message = @from_json.dup
+    message.option53 = 1
     assert_equal 'DHCP Discover', message.name
   end
 
@@ -35,6 +80,20 @@ class Message < Minitest::Test
       message.pack
     end
     message.option53=1
+    assert_equal packed, message.pack
+
+    message = @from_json.dup
+    packed = Lib::BOOTP::Packet.new(op: 1, chaddr: '00:11:22:33:44:55', xid: message.xid).pack
+    packed += [0x63825363.to_i].pack('N')
+    packed += [53, 1, 1].pack('C3')
+    packed += [255].pack('C')
+    (1..60).each do
+      packed += [0].pack('C')
+    end
+    assert_raises Lib::DHCP::SanityCheck do
+      message.pack
+    end
+    message.option53 = 1
     assert_equal packed, message.pack
   end
 

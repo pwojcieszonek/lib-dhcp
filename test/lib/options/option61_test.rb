@@ -29,13 +29,18 @@ class Option61 < Minitest::Test
     assert_equal '01001122334455', @option.payload.to_s
   end
 
+  def test_to_json
+    assert_equal '01001122334455', JSON.parse(@option.to_json)['value']
+  end
 
   def test_length
     assert_equal 7, @option.len
+    assert_equal 7, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
     assert_equal 61, @option.oid
+    assert_equal 61, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack

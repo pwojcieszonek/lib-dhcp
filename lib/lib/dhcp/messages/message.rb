@@ -270,11 +270,6 @@ module Lib
         super
       end
 
-      # protected :op=
-      # # noinspection RubyResolve
-      # protected :option53=
-
-
       protected
 
       def sanity_check

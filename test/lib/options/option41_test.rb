@@ -18,7 +18,6 @@ class Option41 < Minitest::Test
   # Called after every test method runs. Can be used to tear
   # down fixture information.
 
-
   def test_type
     assert_instance_of Lib::DHCP::Option41, @option
   end
@@ -35,12 +34,24 @@ class Option41 < Minitest::Test
     end
   end
 
+  def test_to_json
+    JSON.parse(@option.to_json)['value'].each do |opt|
+      assert_fail_assertion unless opt['address'] == '10.0.0.1' or opt['address'] == '127.0.0.1'
+      assert_fail_assertion unless opt['mask'] == '255.255.255.255' or opt['mask'] == '255.255.255.255'
+      assert_fail_assertion unless opt['broadcast'] == '10.0.0.1' or opt['broadcast'] == '127.0.0.1'
+      assert_fail_assertion unless opt['net'] == '10.0.0.1' or opt['net'] == '127.0.0.1'
+      assert_fail_assertion unless opt['cidr'] == '10.0.0.1/32' or opt['cidr'] == '127.0.0.1/32'
+    end
+  end
+
   def test_length
     assert_equal 8, @option.len
+    assert_equal 8, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
     assert_equal 41, @option.oid
+    assert_equal 41, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack

@@ -34,12 +34,20 @@ class Option55 < Minitest::Test
     end
   end
 
+  def test_to_json
+    JSON.parse(@option.to_json)['value'].each do |p|
+      assert_fail_assertion unless p.to_s == '1' or p.to_s == '10' or p.to_s == '12'
+    end
+  end
+
   def test_length
     assert_equal 3, @option.len
+    assert_equal 3, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
     assert_equal 55, @option.oid
+    assert_equal 55, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack

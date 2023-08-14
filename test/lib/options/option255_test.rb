@@ -26,13 +26,15 @@ class Option255 < Minitest::Test
   end
 
   def test_len
-    assert_equal 0 , @option.len
-    assert_equal 0 , @option_unpack.len
+    assert_equal 0, @option.len
+    assert_equal 0, @option_unpack.len
+    assert_equal 0, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
-    assert_equal 255 , @option.oid
-    assert_equal 255 , @option_unpack.oid
+    assert_equal 255, @option.oid
+    assert_equal 255, @option_unpack.oid
+    assert_equal 255, JSON.parse(@option.to_json)['oid']
   end
 
 
