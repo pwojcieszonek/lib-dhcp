@@ -10,15 +10,57 @@ class LeaseQuery < Minitest::Test
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    @lease_query = Lib::DHCP::Message::LeaseQuery.new(chaddr: '00:11:22:33:44:55')
+    @lease_query = Lib::DHCP::Message::LeaseQuery.new(chaddr: '00:11:22:33:44:55', xid: 438426755)
+    @from_json = Lib::DHCP::Message::LeaseQuery.from_json @lease_query.to_json
+  end
+
+  def test_to_json
+    json = { "op" => { "code" => "1", "name" => "BOOTREQUEST" },
+             "htype" => { "code" => "1", "name" => "Ethernet (10Mb)" },
+             "hlen" => "6",
+             "hops" => "0",
+             "xid" => "438426755",
+             "secs" => "0",
+             "flags" => "0x0",
+             "ciaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "yiaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "siaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "giaddr" =>
+               { "address" => "0.0.0.0",
+                 "mask" => "255.255.255.255",
+                 "net" => "0.0.0.0",
+                 "broadcast" => "0.0.0.0",
+                 "cidr" => "0.0.0.0/32" },
+             "chaddr" => "00:11:22:33:44:55:00:00:00:00:00:00:00:00:00:00",
+             "sname" => ".",
+             "file" => ".",
+             "options" => [{ "name" => "DHCP Message Type", "oid" => 53, "len" => 1, "value" => 10 }] }
+    assert_equal json, JSON.parse(@lease_query.to_json)
   end
 
   def test_op_code
     assert_equal 1, @lease_query.op.to_i
+    assert_equal 1, @from_json.op.to_i
   end
 
   def test_message_type
     assert_equal 10, @lease_query.option53.to_i
+    assert_equal 10, @from_json.option53.to_i
   end
 
   def test_pack
@@ -30,6 +72,7 @@ class LeaseQuery < Minitest::Test
       packed += [0].pack('C')
     end
     assert_equal packed, @lease_query.pack
+    assert_equal packed, @from_json.pack
   end
 
 end

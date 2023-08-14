@@ -59,6 +59,9 @@ class Options < Minitest::Test
     assert_respond_to @options, :<<
   end
 
+  def test_respond_to_json
+    assert_respond_to @options, :to_json
+  end
 
   def test_new
     assert_instance_of Lib::DHCP::Options, @options

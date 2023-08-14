@@ -29,6 +29,16 @@ class Option4 < Minitest::Test
     end
   end
 
+  def test_to_json
+    JSON.parse(@option.to_json)['value'].each do |opt|
+      assert_fail_assertion unless opt['address'] == '10.0.0.1' or opt['address'] == '127.0.0.1'
+      assert_fail_assertion unless opt['mask'] == '255.255.255.255' or opt['mask'] == '255.255.255.255'
+      assert_fail_assertion unless opt['broadcast'] == '10.0.0.1' or opt['broadcast'] == '127.0.0.1'
+      assert_fail_assertion unless opt['net'] == '10.0.0.1' or opt['net'] == '127.0.0.1'
+      assert_fail_assertion unless opt['cidr'] == '10.0.0.1/32' or opt['cidr'] == '127.0.0.1/32'
+    end
+  end
+
   def test_to_integer
     @option.payload.each do |ip|
       assert_fail_assertion unless ip.to_i == 167772161 or ip.to_i == 2130706433
@@ -37,10 +47,12 @@ class Option4 < Minitest::Test
 
   def test_length
     assert_equal 8, @option.len
+    assert_equal 8, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
     assert_equal 4, @option.oid
+    assert_equal 4, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack

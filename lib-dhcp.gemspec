@@ -26,6 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'minitest'
 
-  spec.add_dependency 'lib-bootp', '~> 0.1'
-  spec.add_dependency 'net-address', '~> 0.1'
+  spec.add_dependency 'lib-bootp', '~> 0.2.5'
+  spec.add_dependency 'net-address', '~> 0.2.2'
 end

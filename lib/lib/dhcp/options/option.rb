@@ -45,6 +45,24 @@ module Lib
         NAME[@oid.to_i]
       end
 
+      def to_json(*params)
+        self.to_h.to_json
+      end
+
+      def to_h
+        {
+          name: self.name,
+          oid: self.oid.to_i,
+          len: self.len,
+          value: self.value.respond_to?(:map) ? self.value.map { |v| v.respond_to?(:to_h) ? v.to_h : v } : self.value
+        }
+      end
+
+      def self.from_json(json)
+        json = json.is_a?(Hash) ? json : JSON.parse(json)
+        self.new(json.transform_keys(&:to_sym)[:oid], json.transform_keys(&:to_sym)[:value])
+      end
+
       def self.unpack(packet)
         oid, len = packet.unpack('C2')
         payload = nil

@@ -18,7 +18,6 @@ class Option36 < Minitest::Test
   # Called after every test method runs. Can be used to tear
   # down fixture information.
 
-
   def test_type
     assert_instance_of Lib::DHCP::Option36, @option
   end
@@ -31,13 +30,18 @@ class Option36 < Minitest::Test
     assert_equal 1, @option.payload.to_i
   end
 
+  def test_to_json
+    assert_equal 1, JSON.parse(@option.to_json)['value']
+  end
 
   def test_length
     assert_equal 1, @option.len
+    assert_equal 1, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
     assert_equal 36, @option.oid
+    assert_equal 36, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack

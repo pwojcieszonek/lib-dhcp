@@ -26,14 +26,21 @@ class Option43 < Minitest::Test
     assert_equal 'http://acs.example.com/acs', @option.option1.payload.to_s
   end
 
+  def test_to_json
+    assert_equal 'http://acs.example.com/acs', JSON.parse(@option.to_json)['value'].first['value']
+  end
+
   def test_length
     assert_equal 28, @option.len
+    assert_equal 28, JSON.parse(@option.to_json)['len']
     #suboption 1
     assert_equal 26, @option.option1.len
+    assert_equal 26, JSON.parse(@option.to_json)['value'].first['len']
   end
 
   def test_oid
     assert_equal 43, @option.oid
+    assert_equal 43, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack

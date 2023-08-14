@@ -9,8 +9,11 @@ module Lib
   module DHCP
     class Message
       class LeaseQuery < Message
-        def initialize(htype: 1, hlen: 6, hops: 0, xid: nil, secs: 0, flags: 0, ciaddr: 0, yiaddr: 0, siaddr: 0, giaddr: 0, chaddr: , sname: '.', file: '.', options: nil)
-          super(
+        def initialize(htype: 1, hlen: 6, hops: 0, xid: nil, secs: 0, flags: 0, ciaddr: 0, yiaddr: 0, siaddr: 0, giaddr: 0, chaddr: 0, sname: '.', file: '.', options: nil)
+          if block_given?
+            yield self
+          else
+            super(
               :op => BOOTREQUEST,
               :htype => htype,
               :hlen => hlen,
@@ -25,16 +28,16 @@ module Lib
               :chaddr => chaddr,
               :sname => sname,
               :file => file
-          )
-          if options.is_a? Array or options.is_a? Lib::DHCP::Options
-            options.each { |option| self.options.add option unless option.oid.to_i == Option::MESSAGE_TYPE }
-          elsif options.is_a? Lib::DHCP::Option
-            self.options.add options
-          elsif !options.nil?
-            raise TypeError, "Can't convert #{options.class.name} to Lib::DHCP::Option"
+            )
+            if options.is_a? Array or options.is_a? Lib::DHCP::Options
+              options.each { |option| self.options.add option unless option.oid.to_i == Option::MESSAGE_TYPE }
+            elsif options.is_a? Lib::DHCP::Option
+              self.options.add options
+            elsif !options.nil?
+              raise TypeError, "Can't convert #{options.class.name} to Lib::DHCP::Option"
+            end
           end
           self.options.add Lib::DHCP::Option53.new(LEASE_QUERY)
-
         end
 
         def pack

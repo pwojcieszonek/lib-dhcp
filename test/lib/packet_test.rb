@@ -42,6 +42,10 @@ class Packet < Minitest::Test
     assert_respond_to @packet, :op=
   end
 
+  def test_respond_to_json
+    assert_respond_to @packet, :to_json
+  end
+
   def test_op
     assert_kind_of Lib::BOOTP::Packet::OpCode, @packet.op
   end

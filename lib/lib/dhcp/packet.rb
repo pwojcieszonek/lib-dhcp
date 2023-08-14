@@ -29,6 +29,10 @@ module Lib
 
       end
 
+      def to_h
+        super.merge({ options: self.options.map(&:to_h) })
+      end
+
       def option0
         self.options.select 0
       end
@@ -57,6 +61,16 @@ module Lib
         @options ||= Lib::DHCP::Options.new
       end
 
+      def options=(opt)
+        if opt.respond_to? :each
+          opt.each do |option|
+            self.options.add(option)
+          end
+        else
+          self.options.add opt
+        end
+      end
+
       def self.unpack(packet)
         bootp, cookie, options = packet.unpack('a236Na*')
         raise RuntimeError, "Magick-Cookie mismatch #{cookie.to_i.to_s(16)}" unless cookie.to_i == MAGICK_COOKIE.to_i
@@ -64,6 +78,12 @@ module Lib
         dhcp.instance_variable_set(:@options, Lib::DHCP::Options.unpack(options))
         dhcp
       end
+
+      # def self.from_json(json)
+      #   #json = json.is_a?(Hash) ? json : JSON.parse(json)
+      #   super
+      #   #self.options = json['options']
+      # end
 
       def pack
         # TODO Max Message Size support

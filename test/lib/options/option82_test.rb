@@ -28,6 +28,12 @@ class Option82 < Minitest::Test
     assert_equal 'remote-id', @option.option2.payload.to_s
   end
 
+  def test_to_json
+    assert_equal [{ "name" => "DHCP SubOption1", "oid" => 1, "len" => 10, "value" => "circuit-id" },
+                  { "name" => "DHCP SubOption2", "oid" => 2, "len" => 9, "value" => "remote-id" }],
+                 JSON.parse(@option.to_json)['value']
+  end
+
   def test_length
     assert_equal 23, @option.len
     #suboption 1

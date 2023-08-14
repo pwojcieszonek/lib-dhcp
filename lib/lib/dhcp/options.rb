@@ -3,6 +3,7 @@
 # Copyright 22.12.2017 by Piotr Wojcieszonek
 
 require 'forwardable'
+require 'json'
 
 module Lib
   module DHCP
@@ -24,7 +25,15 @@ module Lib
       end
 
       def add(option)
-        @options << create_option(option)
+        option = begin
+                   JSON.parse(option)
+                 rescue JSON::ParserError
+                   option
+                 rescue TypeError
+                   option
+                 end
+        option = create_option(option)
+        @options << option unless self.include? option
       end
 
       def []=(index, option)
@@ -63,7 +72,6 @@ module Lib
           options << option
           break if option.oid == Lib::DHCP::Option::END_OPTION
           offset += (option.len.to_i + 2)
-          #(option.oid == 0 or option.oid == 255) ? offset += (option.len.to_i + 1) : offset += (option.len.to_i + 2)
         end
         options
       end
@@ -72,11 +80,13 @@ module Lib
 
       def create_option(option)
         if option.is_a? Array
-          eval("Lib::DHCP::Option#{option[0].to_i}").new(option[1])
+          Lib::DHCP.const_get("Option#{option[0].to_i}").new(option[1])
         elsif option.is_a? Option
           option
         elsif option.is_a?(Integer) and (option == 0 or option == 255)
-          eval("Lib::DHCP::Option#{option.to_i}").new(option.to_i)
+          Lib::DHCP.const_get("Option#{option.to_i}").new
+        elsif option.is_a? Hash
+          Lib::DHCP.const_get("Option#{option.transform_keys(&:to_sym)[:oid].to_i}").new(option.transform_keys(&:to_sym)[:value])
         else
           Lib::DHCP::Option.unpack(option)
         end

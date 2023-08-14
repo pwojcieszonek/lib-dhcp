@@ -11,8 +11,6 @@ module Lib
       # DHCP MESSAGE TYPE - This option is used to convey the type of the DHCP message.
       # The code for this option is 53, and its length is 1.
 
-      def_delegators :@payload, :to_s
-
       def initialize(message_type)
         raise ArgumentError, "Illegal value for DHCP Message Type = #{message_type}" unless (1..255).include? message_type.to_i
         super MESSAGE_TYPE, message_type.to_i

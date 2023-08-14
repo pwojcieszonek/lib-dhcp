@@ -27,13 +27,18 @@ class Option18 < Minitest::Test
     assert_equal '/test/ext/path/', @option.payload.to_s
   end
 
+  def test_to_json
+    assert_equal '/test/ext/path/', JSON.parse(@option.to_json)['value']
+  end
 
   def test_length
     assert_equal 15, @option.len
+    assert_equal 15, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
     assert_equal 18, @option.oid
+    assert_equal 18, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack

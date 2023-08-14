@@ -25,16 +25,22 @@ class Option16 < Minitest::Test
     assert_equal '10.0.0.1', @option.payload.to_s
   end
 
+  def test_to_json
+    assert_equal '10.0.0.1', JSON.parse(@option.to_json)['value']['address']
+  end
+
   def test_to_integer
     assert_equal 167772161, @option.payload.to_i
   end
 
   def test_length
     assert_equal 4, @option.len
+    assert_equal 4, JSON.parse(@option.to_json)['len']
   end
 
   def test_oid
     assert_equal 16, @option.oid
+    assert_equal 16, JSON.parse(@option.to_json)['oid']
   end
 
   def test_pack
