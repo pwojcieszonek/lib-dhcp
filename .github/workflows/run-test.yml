@@ -5,6 +5,8 @@ on: [ push, pull_request ]
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/oracle/truffleruby:22.3.1
 
     steps:
       - name: Checkout code
