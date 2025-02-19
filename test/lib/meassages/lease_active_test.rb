@@ -11,7 +11,7 @@ class LeaseActive < Minitest::Test
   # to set up fixture information.
   def setup
     @lease_active = Lib::DHCP::Message::LeaseActive.new(chaddr: '00:11:22:33:44:55', xid: 2971459332)
-    @from_json = Lib::DHCP::Message::LeaseActive.from_json @lease_active.to_json
+    @from_json = Lib::DHCP::Message.from_json @lease_active.to_json
   end
 
   def test_to_json
@@ -74,4 +74,9 @@ class LeaseActive < Minitest::Test
     assert_equal packed, @lease_active.pack
     assert_equal packed, @from_json.pack
   end
+
+  def test_from_json
+    assert_instance_of Lib::DHCP::Message::LeaseActive, @from_json
+  end
+
 end

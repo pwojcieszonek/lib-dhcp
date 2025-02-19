@@ -13,7 +13,7 @@ class Request < Minitest::Test
     options = []
     options << Lib::DHCP::Option50.new('10.0.0.1')
     @request = Lib::DHCP::Message::Request.new(chaddr: '00:11:22:33:44:55', options: options, xid: 2486822374)
-    @from_json = Lib::DHCP::Message::Request.from_json @request.to_json
+    @from_json = Lib::DHCP::Message.from_json @request.to_json
   end
 
   def test_to_json
@@ -125,5 +125,8 @@ class Request < Minitest::Test
     assert_equal packed, @from_json.pack
   end
 
+  def test_from_json
+    assert_instance_of Lib::DHCP::Message::Request, @from_json
+  end
 
 end

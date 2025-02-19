@@ -10,7 +10,7 @@ class ACK < Minitest::Test
   # to set up fixture information.
   def setup
     @ack = Lib::DHCP::Message::ACK.new(chaddr: '00:11:22:33:44:55', xid: 1509066257)
-    @from_json = Lib::DHCP::Message::ACK.from_json @ack.to_json
+    @from_json = Lib::DHCP::Message.from_json @ack.to_json
   end
 
   def test_op_code
@@ -72,6 +72,10 @@ class ACK < Minitest::Test
     end
     assert_equal packed, @ack.pack
     assert_equal packed, @from_json.pack
+  end
+
+  def test_from_json
+    assert_instance_of Lib::DHCP::Message::ACK, @from_json
   end
 
 end

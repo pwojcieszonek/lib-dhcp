@@ -14,7 +14,7 @@ class Offer < Minitest::Test
     options << Lib::DHCP::Option51.new(3600)
     options << Lib::DHCP::Option54.new('10.0.0.2')
     @offer = Lib::DHCP::Message::Offer.new(chaddr: '00:11:22:33:44:55', yiaddr: '10.0.0.1', options: options, xid: 3881324093)
-    @from_json = Lib::DHCP::Message::Offer.from_json @offer.to_json
+    @from_json = Lib::DHCP::Message.from_json @offer.to_json
   end
 
   def test_to_json
@@ -178,6 +178,10 @@ class Offer < Minitest::Test
     assert_raises Lib::DHCP::SanityCheck::Offer do
       offer.send(:sanity_check)
     end
+  end
+
+  def test_from_json
+    assert_instance_of Lib::DHCP::Message::Offer, @from_json
   end
 
 end

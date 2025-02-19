@@ -49,6 +49,10 @@ module Lib
         end
       end
 
+      def self.from_json(json)
+        self.unpack(super(json).pack)
+      end
+
       def self.unpack(packet)
         packet =  super(packet)
         # noinspection RubyResolve

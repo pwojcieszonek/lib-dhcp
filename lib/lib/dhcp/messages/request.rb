@@ -9,7 +9,7 @@ module Lib
   module DHCP
     class Message
       class Request < Message
-        def initialize(htype: 1, hlen: 6, hops: 0, xid: nil, secs: 0, flags: 0, ciaddr: 0, yiaddr: 0, siaddr: 0, giaddr: 0, chaddr: 0, sname: '.', file: '.', options: nil)
+        def initialize(op:BOOTREQUEST, htype: 1, hlen: 6, hops: 0, xid: nil, secs: 0, flags: 0, ciaddr: 0, yiaddr: 0, siaddr: 0, giaddr: 0, chaddr: 0, sname: '.', file: '.', options: nil)
           if block_given?
             yield self
           else
@@ -50,7 +50,7 @@ module Lib
 
         def self.unpack(packet)
           res = super(packet)
-          raise TypeError, "No implicit conversion of #{res.class.name} into #{self.class.name}" unless res.is_a? self.class
+          raise TypeError, "No implicit conversion of #{res.class.name} into #{self.name}" unless res.is_a? self
           res
         end
 

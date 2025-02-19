@@ -10,6 +10,7 @@ class Message < Minitest::Test
   # to set up fixture information.
   def setup
     @message = Lib::DHCP::Message.new(op: 1, chaddr: '00:11:22:33:44:55', xid: 3474444682)
+    @message.option53 = 1
     @from_json = Lib::DHCP::Message.from_json @message.to_json
   end
 
@@ -48,7 +49,7 @@ class Message < Minitest::Test
              "chaddr" => "00:11:22:33:44:55:00:00:00:00:00:00:00:00:00:00",
              "sname" => ".",
              "file" => ".",
-             "options" => [] }
+             "options" => [{"name"=>"DHCP Message Type", "oid"=>53, "len"=>1, "value"=>1}] }
     assert_equal json, JSON.parse(@message.to_json)
   end
 
@@ -58,43 +59,29 @@ class Message < Minitest::Test
   end
 
   def test_name
-    message = @message.dup
-    message.option53=1
-    assert_equal 'DHCP Discover', message.name
-
-    message = @from_json.dup
-    message.option53 = 1
-    assert_equal 'DHCP Discover', message.name
+    assert_equal 'DHCP Discover', @message.name
+    assert_equal 'DHCP Discover', @from_json.name
   end
 
   def test_pack
-    message = @message.dup
-    packed = Lib::BOOTP::Packet.new(op:1 , chaddr: '00:11:22:33:44:55', xid: message.xid).pack
+    packed = Lib::BOOTP::Packet.new(op:1 , chaddr: '00:11:22:33:44:55', xid: @message.xid).pack
     packed += [0x63825363.to_i].pack('N')
     packed += [53,1,1].pack('C3')
     packed += [255].pack('C')
     (1..60).each do
       packed += [0].pack('C')
     end
-    assert_raises Lib::DHCP::SanityCheck do
-      message.pack
-    end
-    message.option53=1
-    assert_equal packed, message.pack
+    assert_equal packed, @message.pack
 
-    message = @from_json.dup
-    packed = Lib::BOOTP::Packet.new(op: 1, chaddr: '00:11:22:33:44:55', xid: message.xid).pack
+    packed = Lib::BOOTP::Packet.new(op: 1, chaddr: '00:11:22:33:44:55', xid: @message.xid).pack
     packed += [0x63825363.to_i].pack('N')
     packed += [53, 1, 1].pack('C3')
     packed += [255].pack('C')
     (1..60).each do
       packed += [0].pack('C')
     end
-    assert_raises Lib::DHCP::SanityCheck do
-      message.pack
-    end
-    message.option53 = 1
-    assert_equal packed, message.pack
+
+    assert_equal packed, @from_json.pack
   end
 
   def test_unpack_discover
