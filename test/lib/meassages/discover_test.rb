@@ -11,7 +11,7 @@ class Discover < Minitest::Test
   # to set up fixture information.
   def setup
     @discover = Lib::DHCP::Message::Discover.new(chaddr: '00:11:22:33:44:55', xid: 1374095120)
-    @from_json = Lib::DHCP::Message::Discover.from_json @discover.to_json
+    @from_json = Lib::DHCP::Message.from_json @discover.to_json
   end
 
   def test_to_json
@@ -121,6 +121,10 @@ class Discover < Minitest::Test
     end
     assert_equal packed, @discover.pack
     assert_equal packed, @from_json.pack
+  end
+
+  def test_from_json
+    assert_instance_of Lib::DHCP::Message::Discover, @from_json
   end
 
 

@@ -10,7 +10,7 @@ class LeaseUnknown < Minitest::Test
   # to set up fixture information.
   def setup
     @lease_unknown = Lib::DHCP::Message::LeaseUnknown.new(chaddr: '00:11:22:33:44:55', xid: 1514393599)
-    @from_json = Lib::DHCP::Message::LeaseUnknown.from_json @lease_unknown.to_json
+    @from_json = Lib::DHCP::Message.from_json @lease_unknown.to_json
   end
 
   def test_to_json
@@ -73,4 +73,9 @@ class LeaseUnknown < Minitest::Test
     assert_equal packed, @lease_unknown.pack
     assert_equal packed, @from_json.pack
   end
+
+  def test_from_json
+    assert_instance_of Lib::DHCP::Message::LeaseUnknown, @from_json
+  end
+
 end

@@ -10,7 +10,7 @@ class Inform < Minitest::Test
   # to set up fixture information.
   def setup
     @inform = Lib::DHCP::Message::Inform.new(chaddr: '00:11:22:33:44:55', xid: 1950983582)
-    @from_json = Lib::DHCP::Message::Inform.from_json @inform.to_json
+    @from_json = Lib::DHCP::Message.from_json @inform.to_json
   end
 
   def test_to_json
@@ -72,6 +72,10 @@ class Inform < Minitest::Test
     end
     assert_equal packed, @inform.pack
     assert_equal packed, @from_json.pack
+  end
+
+  def test_from_json
+    assert_instance_of Lib::DHCP::Message::Inform, @from_json
   end
 
 end
