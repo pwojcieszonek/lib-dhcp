@@ -13,7 +13,7 @@ module Lib
       def_delegators :@payload, :map, :map!, :[], :[]=, :each, :<<, :shift, :pop
 
       def initialize(*request_option)
-        super PARAMETER_REQUEST, request_option
+        super PARAMETER_REQUEST, request_option.flatten
       end
 
       def pack
