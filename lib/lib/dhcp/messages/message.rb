@@ -52,7 +52,9 @@ module Lib
       def self.from_json(json)
         json = JSON.parse((json.is_a?(Hash) ? json.to_json : json), symbolize_names: true)
         json[:options] = json[:options].reject { |option| option[:oid] == 255 || option[:oid] == 0 }
-        self.unpack(super(json.to_json).pack)
+        message = super(json.to_json)
+        message.option53 = json[:options].select { |option| option[:oid] == 53 }.first[:value]
+        self.unpack(message.pack)
       end
 
       def self.unpack(packet)
