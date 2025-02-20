@@ -50,9 +50,9 @@ module Lib
       end
 
       def self.from_json(json)
-        json = JSON.parse(json) if json.is_a? String
-        json["options"] = json["options"].reject { |option| option["oid"] == 255 || option["oid"] == 0 }
-        self.unpack(super(json).pack)
+        json = JSON.parse((json.is_a?(Hash) ? json.to_json : json), symbolize_names: true)
+        json[:options] = json[:options].reject { |option| option[:oid] == 255 || option[:oid] == 0 }
+        self.unpack(super(json.to_json).pack)
       end
 
       def self.unpack(packet)
