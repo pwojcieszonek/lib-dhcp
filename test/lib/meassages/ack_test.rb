@@ -76,6 +76,12 @@ class ACK < Minitest::Test
 
   def test_from_json
     assert_instance_of Lib::DHCP::Message::ACK, @from_json
+    packet = Lib::DHCP::Message.from_json(
+      Lib::DHCP::Message.unpack(
+        Lib::DHCP::Message::ACK.new(chaddr: '00:11:22:33:44:55', xid: 1374095120).pack
+      ).to_json
+    )
+    assert_instance_of Lib::DHCP::Message::ACK, packet
   end
 
 end

@@ -233,6 +233,15 @@ class Decline < Minitest::Test
 
   def test_from_json
     assert_instance_of Lib::DHCP::Message::Decline, @from_json
+    options = []
+    options << Lib::DHCP::Option50.new('10.0.0.1')
+    options << Lib::DHCP::Option54.new('10.0.0.2')
+    packet = Lib::DHCP::Message.from_json(
+      Lib::DHCP::Message.unpack(
+        Lib::DHCP::Message::Decline.new(chaddr: '00:11:22:33:44:55', xid: 1374095120, options: options).pack
+      ).to_json
+    )
+    assert_instance_of Lib::DHCP::Message::Decline, packet
   end
 
 end
