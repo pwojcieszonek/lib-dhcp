@@ -50,6 +50,8 @@ module Lib
       end
 
       def self.from_json(json)
+        json = JSON.parse(json) if json.is_a? String
+        json["options"] = json["options"].reject { |option| option["oid"] == 255 || option["oid"] == 0 }
         self.unpack(super(json).pack)
       end
 
