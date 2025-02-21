@@ -79,11 +79,14 @@ module Lib
         dhcp
       end
 
-      # def self.from_json(json)
-      #   #json = json.is_a?(Hash) ? json : JSON.parse(json)
-      #   super
-      #   #self.options = json['options']
-      # end
+      def self.from_json(json)
+        json = json.is_a?(Hash) ? json : JSON.parse(json, symbolize_names: true)
+        message = super
+        json[:options].each do |option|
+          message.options.add Lib::DHCP::Option.from_json(option.to_json)
+        end
+        message
+      end
 
       def pack
         # TODO Max Message Size support

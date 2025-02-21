@@ -17,16 +17,21 @@ module Lib
           end
 
           def initialize(*sub_option)
+            sub_option = sub_option.first if sub_option.first.is_a?(Array) && sub_option.first.first.is_a?(Hash)
             oid = self.class.name.split('::').last.sub(/Option/, '').to_i
             sub_options = []
             sub_option.each do |sub|
-              if sub.is_a? Lib::DHCP::SubOption
-                opt =  sub
-              elsif sub.is_a? Array
+              case sub
+              when Array
                 opt = Lib::DHCP::SubOption.new(sub[0], sub[1])
+              when Lib::DHCP::SubOption
+                opt = sub
+              when Hash
+                opt = Lib::DHCP::SubOption.new(sub[:oid], sub[:value])
               else
                 raise ArgumentError, 'Unknown SubOption parameter type'
               end
+
               sub_options << opt
               define_singleton_method("option#{opt.oid.to_i}".to_sym) { opt }
               #define_singleton_method(:option1) {opt}
