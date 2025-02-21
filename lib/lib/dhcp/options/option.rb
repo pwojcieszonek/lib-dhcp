@@ -59,8 +59,10 @@ module Lib
       end
 
       def self.from_json(json)
-        json = json.is_a?(Hash) ? json : JSON.parse(json)
-        self.new(json.transform_keys(&:to_sym)[:oid], json.transform_keys(&:to_sym)[:value])
+        json = json.is_a?(Hash) ? JSON.parse(json.to_json, symbolize_names: true) : JSON.parse(json, symbolize_names: true)
+        Lib::DHCP.const_get("Option#{json.transform_keys(&:to_sym)[:oid].to_i}").new(
+          json.transform_keys(&:to_sym)[:value]
+        )
       end
 
       def self.unpack(packet)
